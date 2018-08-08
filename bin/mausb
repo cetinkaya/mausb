@@ -1,0 +1,174 @@
+#!/usr/bin/env ruby
+
+# Copyright 2018 Ahmet Cetinkaya
+
+# This file is part of Mausb.
+
+# Mausb is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# Mausb is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with Mausb.  If not, see <http://www.gnu.org/licenses/>.
+
+
+require 'mausb'
+
+$mounted_usb_devices = Mausb::mounted_usb_devices
+$unmounted_usb_devices = Mausb::unmounted_usb_devices
+$mc = $mounted_usb_devices.length
+$uc = $unmounted_usb_devices.length
+
+def no_device
+  puts "There is currently no device connected to the computer."
+end
+
+def no_device_to_mount
+  puts "There is currently no device to mount."
+end
+
+def no_device_to_unmount
+  puts "There is currently no device to unmount."
+end
+
+def direct_mount_or_ask_to_mount
+  if $uc == 1
+    direct_mount
+  else
+    ask_to_mount
+  end
+end
+
+def direct_mount
+  puts "Mounting #{$unmounted_usb_devices[0].link}."
+  Mausb::udisksctl_mount($unmounted_usb_devices[0].link)
+end
+
+def get_one_of(choices, show_choices=nil, default=nil)
+  while true
+    if show_choices
+      puts choices.join(", ")
+    end
+    print "> "
+    str = gets.strip
+    if choices.index(str)
+      return str
+    end
+    if default and str == ""
+      return default
+    end
+  end
+end
+
+def ask_to_mount
+  puts "Select device to mount: "
+  choices = (1..$unmounted_usb_devices.length).to_a.map{|n| n.to_s}
+  $unmounted_usb_devices.each.with_index do |usb_device, i|
+    default_text = ""
+    default_text = " [DEFAULT]" if i == 0
+    puts "#{choices[i]}) #{usb_device.info_text}#{default_text}"
+  end
+  index = get_one_of(choices, show_choices=nil, default="1").to_i - 1
+  puts "Mounting #{$unmounted_usb_devices[index].link}."
+  Mausb::udisksctl_mount($unmounted_usb_devices[index].link)
+end
+
+
+def direct_unmount_or_ask_to_unmount
+  if $mc == 1
+    direct_unmount
+  else
+    ask_to_unmount
+  end
+end
+
+def direct_unmount
+  puts "Unmounting #{$mounted_usb_devices[0].link}."
+  Mausb::udisksctl_unmount($mounted_usb_devices[0].link)
+end
+
+def ask_to_unmount
+  puts "Select device to unmount: "
+  choices = (1..$mounted_usb_devices.length).to_a.map{|n| n.to_s}
+  $mounted_usb_devices.each.with_index do |usb_device, i|
+    default_text = ""
+    default_text = " [DEFAULT]" if i == 0
+    puts "#{choices[i]}) #{usb_device.info_text}#{default_text}"
+  end
+  index = get_one_of(choices, show_choices=nil, default="1").to_i - 1
+  puts "Unmounting #{$mounted_usb_devices[index].link}."
+  Mausb::udisksctl_unmount($mounted_usb_devices[index].link)
+end
+
+def ask_what_to_do
+  puts "Unmounted devices:"
+  $unmounted_usb_devices.each.with_index do |usb_device, i|
+    puts " #{usb_device.info_text}"
+  end
+  puts "Mounted devices:"
+  $mounted_usb_devices.each.with_index do |usb_device, i|
+    puts " #{usb_device.info_text}"
+  end
+  puts "Choose operation m (mount, DEFAULT) or u (unmount)."
+  op = get_one_of(["m", "u"], show_choices=nil, default="m")
+  if op == "m"
+    direct_mount_or_ask_to_mount
+  else
+    direct_unmount_or_ask_to_unmount
+  end
+end
+
+def print_info
+  if $uc > 0
+    puts "Unmounted devices:"
+    $unmounted_usb_devices.each.with_index do |usb_device, i|
+      puts " #{usb_device.info_text}"
+    end
+  end
+  if $mc > 0
+    puts "Mounted devices:"
+    $mounted_usb_devices.each.with_index do |usb_device, i|
+      puts " #{usb_device.info_text}"
+    end
+  end
+end
+
+if ARGV.length == 0
+  if $mc == 0
+    if $uc > 0
+      direct_mount_or_ask_to_mount
+    else
+      no_device
+    end
+  else
+    if $uc == 0
+      direct_unmount_or_ask_to_unmount
+    else
+      ask_what_to_do
+    end
+  end
+else
+  if ARGV[0] == "m"
+    if $uc > 0
+      direct_mount_or_ask_to_mount
+    else
+      no_device_to_mount
+    end
+  elsif ARGV[0] == "u"
+    if $mc > 0
+      direct_unmount_or_ask_to_unmount
+    else
+      no_device_to_unmount
+    end
+  else
+    if $mc > 0 or $uc > 0
+      print_info
+    end
+  end
+end
