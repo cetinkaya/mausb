@@ -21,7 +21,7 @@ gem install --local mausb-0.1.gem
 
 ## Examples
 
-`mausb` tries to guess what you want to do. So if you have a single connected device, which is not yet mounted, running
+`mausb` tries to guess what you want to do. So if you have a single connected device that is not yet mounted, running
 
 ```sh
 mausb
