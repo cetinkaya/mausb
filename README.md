@@ -29,7 +29,7 @@ mausb
 
 will result in mounting of that device by means of executing `udisksctl mount -b DEVICE-LINK`.
 
-If on the other hand, if you have a single mounted device (and no other connected devices), running `mausb` will result in unmounting of that device. If you have two or more connected devices running `mausb` will ask you what to do.
+On the other hand, if you have a single mounted device (and no other connected devices), running `mausb` will result in unmounting of that device. If you have two or more connected devices running `mausb` will ask you what to do.
 
 
 You can also run `mausb m` for mounting connected devices; `mausb u` for unmounting already mounted devices; `mausb l` for listing all connected devices (mounted or unmounted).
