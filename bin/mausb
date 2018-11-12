@@ -107,11 +107,11 @@ def ask_to_unmount
 end
 
 def ask_what_to_do
-  puts "Unmounted devices:"
+  puts "Mount (m) unmounted devices:"
   $unmounted_usb_devices.each.with_index do |usb_device, i|
     puts " #{usb_device.info_text}"
   end
-  puts "Mounted devices:"
+  puts "Unmount (u) mounted devices:"
   $mounted_usb_devices.each.with_index do |usb_device, i|
     puts " #{usb_device.info_text}"
   end
