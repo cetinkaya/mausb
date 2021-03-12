@@ -33,6 +33,10 @@ def no_device_to_mount
   puts "There is currently no device to mount."
 end
 
+def no_device_to_poweroff
+  puts "There is currently no device to power-off."
+end
+
 def no_device_to_unmount
   puts "There is currently no device to unmount."
 end
@@ -48,6 +52,19 @@ end
 def direct_mount
   puts "Mounting #{$unmounted_usb_devices[0].link}."
   Mausb::udisksctl_mount($unmounted_usb_devices[0].link)
+end
+
+def direct_poweroff_or_ask_to_poweroff
+  if $uc == 1
+    direct_poweroff
+  else
+    ask_to_poweroff
+  end
+end
+
+def direct_poweroff
+  puts "Powering off #{$unmounted_usb_devices[0].link}."
+  Mausb::udisksctl_poweroff($unmounted_usb_devices[0].link)
 end
 
 def get_one_of(choices, show_choices=nil, default=nil)
@@ -79,6 +96,18 @@ def ask_to_mount
   Mausb::udisksctl_mount($unmounted_usb_devices[index].link)
 end
 
+def ask_to_poweroff
+  puts "Select device to power-off: "
+  choices = (1..$unmounted_usb_devices.length).to_a.map{|n| n.to_s}
+  $unmounted_usb_devices.each.with_index do |usb_device, i|
+    default_text = ""
+    default_text = " [DEFAULT]" if i == 0
+    puts "#{choices[i]}) #{usb_device.info_text}#{default_text}"
+  end
+  index = get_one_of(choices, show_choices=nil, default="1").to_i - 1
+  puts "Powering off #{$unmounted_usb_devices[index].link}."
+  Mausb::udisksctl_poweroff($unmounted_usb_devices[index].link)
+end
 
 def direct_unmount_or_ask_to_unmount
   if $mc == 1
@@ -159,6 +188,12 @@ else
       direct_mount_or_ask_to_mount
     else
       no_device_to_mount
+    end
+  elsif ARGV[0] == "p"
+    if $uc > 0
+      direct_poweroff_or_ask_to_poweroff
+    else
+      no_device_to_poweroff
     end
   elsif ARGV[0] == "u"
     if $mc > 0

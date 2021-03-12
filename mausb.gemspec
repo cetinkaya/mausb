@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "mausb"
-  spec.version       = "0.1"
+  spec.version       = "0.2"
   spec.authors       = ["Ahmet Cetinkaya"]
   spec.email         = ["cetinkayaahmet@yahoo.com"]
   spec.executables   << 'mausb'

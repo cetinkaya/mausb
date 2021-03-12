@@ -32,4 +32,4 @@ will result in mounting of that device by means of executing `udisksctl mount -b
 On the other hand, if you have a single mounted device (and no other connected devices), running `mausb` will result in unmounting of that device. If you have two or more connected devices running `mausb` will ask you what to do.
 
 
-You can also run `mausb m` for mounting connected devices; `mausb u` for unmounting already mounted devices; `mausb l` for listing all connected devices (mounted or unmounted).
+You can also run `mausb m` for mounting connected devices; `mausb u` for unmounting already mounted devices; `mausb p` for powering off unmounted devices as a safety mechanism before removing them; `mausb l` for listing all connected devices (mounted or unmounted).

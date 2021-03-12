@@ -39,12 +39,16 @@ module Mausb
       ui = Mausb.udisksctl_info(@id)
       link + " (" + keys.map{|key| "#{key}: #{ui[key]}"}.join(", ") + ")"
     end
+
+    def to_s
+      "Id: #{@id}, Link: #{link}"
+    end
   end
 
   def Mausb.usb_ids
     folder = "/dev/disk/by-id"
     ids = Dir.entries("/dev/disk/by-id").find_all{|entry|
-      entry[0..3] == "usb-"
+      entry[0..3] == "usb-" or entry[0..3] == "ata-"
     }
     ids.find_all{|id|
       ids.find_all{|id2|
@@ -98,5 +102,9 @@ module Mausb
 
   def Mausb.udisksctl_unmount(link)
     `udisksctl unmount -b #{link}`
+  end
+
+  def Mausb.udisksctl_poweroff(link)
+    `udisksctl power-off -b #{link}`
   end
 end
