@@ -73,7 +73,7 @@ def get_one_of(choices, show_choices=nil, default=nil)
       puts choices.join(", ")
     end
     print "> "
-    str = gets.strip
+    str = STDIN.gets.strip
     if choices.index(str)
       return str
     end
